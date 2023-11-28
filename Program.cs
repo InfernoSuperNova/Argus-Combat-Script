@@ -27,7 +27,7 @@ namespace IngameScript
         public Vector3D TargetPosition = Vector3D.Zero;
         public double TargetDistance = 1800;
 
-        public ShipControl ShipControl;
+        public TacticalController tacticalController;
         IMyTerminalBlock reference;
 
         float kP = 40.0f;
@@ -50,6 +50,7 @@ namespace IngameScript
             var allGyros = new List<IMyGyro>();
             var allThrusters = new List<IMyThrust>();
             var allGuns = new List<IMyUserControllableGun>();
+            var allTurrets = new List<IMyLargeTurretBase>();
             reference = GridTerminalSystem.GetBlockWithName("Forward Reference");
             if (reference == null)
             {
@@ -59,6 +60,7 @@ namespace IngameScript
             GridTerminalSystem.GetBlocksOfType(allGyros);
             GridTerminalSystem.GetBlocksOfType(allThrusters);
             GridTerminalSystem.GetBlocksOfType(allGuns);
+            GridTerminalSystem.GetBlocksOfType(allTurrets);
             ClampedIntegralPID pitch = new ClampedIntegralPID(kP, kI, kD, TimeStep, -MaxAngular, MaxAngular);
             ClampedIntegralPID yaw = new ClampedIntegralPID(kP, kI, kD, TimeStep, -MaxAngular, MaxAngular);
 
@@ -80,8 +82,9 @@ namespace IngameScript
             data.program = this;
             data.timeStep = TimeStep;
             data.fireAngleSigma = FireAngleSigma;
-            ShipControl = new ShipControl(data);
 
+
+            tacticalController = new TacticalController(allTurrets, data, reference);
             Runtime.UpdateFrequency = UpdateFrequency.Update1;
         }
 
@@ -97,21 +100,9 @@ namespace IngameScript
 
         public void Main(string argument, UpdateType updateSource)
         {
-            //SCFlags flags = SCFlags.UseManeuverThrustForAchievingDistance | SCFlags.PositionAroundTarget | SCFlags.UnifiedTargetAndRefererencePosition;
-
-            //SCFlags flags = SCFlags.PositionAroundTarget | SCFlags.UnifiedTargetAndRefererencePosition;
-            SCFlags flags = SCFlags.PositionAroundTarget | SCFlags.UnifiedTargetAndRefererencePosition 
-                | SCFlags.CalculateLead | SCFlags.OverrideRoll | SCFlags.UseGunsAsReference | SCFlags.ShootingEnabled;
 
 
-        var updateData = new ShipControlUpdateData();
-            updateData.aimPositionTargetPos = TargetPosition;
-            updateData.requiredDistance = TargetDistance;
-            updateData.selfVelocity = reference.CubeGrid.LinearVelocity;
-            updateData.targetVelocity = Vector3D.Zero;
-            updateData.projectileVelocity = 2000;
-            updateData.rollOverride = 0.5f;
-            ShipControl.Update(flags, updateData);
+            tacticalController.Update();
         }
     }
 }
