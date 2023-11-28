@@ -1,4 +1,4 @@
-﻿
+
 using Sandbox.ModAPI.Ingame;
 using Sandbox.ModAPI.Interfaces;
 using System;
@@ -252,6 +252,33 @@ namespace IngameScript.Classes
             ForwardBackwardPID.Control(thrustError); //Probably need to make structs for each thruster direction so that I don't have to arbitrarily choose a PID here
             SetThrustInAxis((float)ForwardBackwardPID.Value, axis);
         }
+
+        public void DisableThrustOverrides()
+        {
+            foreach (var thruster in UpThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
+            foreach (var thruster in DownThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
+            foreach (var thruster in LeftThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
+            foreach (var thruster in RightThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
+            foreach (var thruster in ForwardThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
+            foreach (var thruster in BackwardThrust)
+            {
+                thruster.ThrustOverride = 0;
+            }
     }
     
 }
