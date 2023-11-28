@@ -279,6 +279,28 @@ namespace IngameScript.Classes
             {
                 thruster.ThrustOverride = 0;
             }
+        }
+
+        public Vector3D GetDirectionOfThrusterAxis(ThrusterDir thrusterDir)
+        {
+            switch (thrusterDir)
+            {
+                case ThrusterDir.Up:
+                    return UpThrust[0].WorldMatrix.Up;
+                case ThrusterDir.Down:
+                    return DownThrust[0].WorldMatrix.Up;
+                case ThrusterDir.Left:
+                    return LeftThrust[0].WorldMatrix.Up;
+                case ThrusterDir.Right:
+                    return RightThrust[0].WorldMatrix.Up;
+                case ThrusterDir.Forward:
+                    return ForwardThrust[0].WorldMatrix.Up;
+                case ThrusterDir.Backward:
+                    return BackwardThrust[0].WorldMatrix.Up;
+                
+            }
+            return UpThrust[0].WorldMatrix.Up;
+        }
     }
     
 }
