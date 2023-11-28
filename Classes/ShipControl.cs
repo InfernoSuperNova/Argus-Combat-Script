@@ -1,4 +1,4 @@
-﻿
+
 using Sandbox.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ namespace IngameScript.Classes
         AvoidCollisions = 1 << 12, //requires: a list of positions to avoid
         ShootingEnabled = 1 << 13, //requires: guns
         UseManeuverThrustForAchievingDistance = 1 << 14, //requires: nothing!
-        Bit15 = 1 << 15,
+        RollToCancelVelocity = 1 << 15,
         Bit16 = 1 << 16,
         Bit17 = 1 << 17,
         Bit18 = 1 << 18,
@@ -79,6 +79,7 @@ namespace IngameScript.Classes
         public Vector3D selfVelocity;
         public Vector3D targetVelocity;
         public float projectileVelocity;
+        public ThrusterDir cancelThrustDir;
     }
 
 
@@ -106,6 +107,7 @@ namespace IngameScript.Classes
 
         public void Update(SCFlags flags, ShipControlUpdateData data)
         {
+
             bool detachedPosition = false;
             Vector3D AimingReferencePos = Reference.GetPosition();
             Vector3D AimingDirection = Vector3D.Zero;
@@ -137,6 +139,7 @@ namespace IngameScript.Classes
                     currentDistanceVector = data.positionOnlyTargetPos - AimingReferencePos;
                 }
 
+
                 Vector3D _TargetDirection = currentDistanceVector.Normalized();
                 float currentDistance = (float)currentDistanceVector.Length();
                 if ((flags & SCFlags.UseManeuverThrustForAchievingDistance) != 0)
@@ -151,6 +154,7 @@ namespace IngameScript.Classes
                 }
                 else
                 {
+
                     float dot = Vector3.Dot(Reference.WorldMatrix.Forward, _TargetDirection);
                     float error = (float)(currentDistance - data.requiredDistance) * dot;
                     error = float.IsNaN(error) ? 0 : error;
@@ -193,6 +197,17 @@ namespace IngameScript.Classes
             {
 
                 Gyroscopes.FaceShipTowards(AimingDirection.Normalized(), 0);
+            }
+
+            if ((flags & SCFlags.RollToCancelVelocity) != 0)
+            {
+                Vector3D currentVelocity = Reference.CubeGrid.LinearVelocity;
+
+                Vector3D thrustDir = Thrusters.GetDirectionOfThrusterAxis(data.cancelThrustDir);
+
+                float rollVelocity = (float)Vector3D.Dot(thrustDir, currentVelocity.Normalized()) * 10000;
+                program.Echo(rollVelocity.ToString());
+                Gyroscopes.ApplyGyroRoll(rollVelocity);
             }
 
 
