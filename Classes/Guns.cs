@@ -59,14 +59,15 @@ namespace IngameScript.Classes
             int activeGunCount = 0;
             foreach (var gun in guns)
             {
-                if (availableGuns[gun] && gun.Enabled)
+                if (availableGuns[gun])
                 {
                     Vector3D GunPos = gun.GetPosition();
-                    if (GunPos.X == double.NaN) continue;
+                    if (double.IsNaN(GunPos.X)) continue;
                     averagePos += gun.GetPosition();
                     activeGunCount++;
                 }
             }
+
             if (activeGunCount == 0) return averagePos;
 
             return averagePos / activeGunCount;
