@@ -1,4 +1,4 @@
-
+﻿
 using Sandbox.ModAPI.Ingame;
 using System;
 using System.Collections.Generic;
@@ -163,7 +163,6 @@ namespace IngameScript.Classes
             }
 
 
-
             if ((flags & SCFlags.ShootingEnabled) != 0)
             {
                 if (Vector3D.Dot(Reference.WorldMatrix.Forward, AimingDirection.Normalized()) > FireAngleSigma)
@@ -224,7 +223,12 @@ namespace IngameScript.Classes
                 Gyroscopes.ApplyGyroRoll(data.rollOverride);
             }
 
-
+            if ((int)flags == 0)
+            {
+                Thrusters.DisableThrustOverrides();
+                Gyroscopes.DisableGyros();
+                Guns.Cancel();
+            }
         }
     }
 }
