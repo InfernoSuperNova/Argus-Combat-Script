@@ -112,5 +112,16 @@ namespace IngameScript.Classes
             gyro.Roll = (float)(transformedRotationVec.Z < double.Epsilon ? transformedRotationVec.Z : gyro.Roll);
             gyro.GyroOverride = true;
         }
+
+        public void DisableGyros()
+        {
+            foreach (var gyro in gyroscopes)
+            {
+                gyro.Pitch = 0;
+                gyro.Yaw = 0;
+                gyro.Roll = 0;
+                gyro.GyroOverride = false;
+            }
+        }
     }
 }
